@@ -30,6 +30,7 @@ hr{
     display: flex;
     justify-content: center;
     align-items: center;
+    color: black;
 }
 
 .tile-2{
@@ -85,4 +86,9 @@ hr{
 .tile-2048{
     background-color: #001F3F;
     color: #FFF5F5;
+}
+
+.tile-beyond{
+    background-color: black;
+    color: white;
 }
