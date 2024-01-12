@@ -8,14 +8,15 @@ window.onload = function(){
 }
 
 function setGame(){
+    score = 0;
     board = [
-        // [2, 0, 0, 0],
-        [2, 2, 2, 2],
-        [2, 0, 0, 0],
-        [2, 0, 0, 0],
-        [2, 0, 0, 0]
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
-
+    spawn();
+    spawn();
     for(let r = 0; r < rows; r++){
         for(let c = 0; c < columns; c++){
             let tile = document.createElement("div");
@@ -36,6 +37,23 @@ function renderBoard(){
     }
 }
 
+function spawn(){
+    for(let r = 0; r < rows; r++){
+        for(let c = 0; c < columns; c++){
+            if(board[r][c] == 0){
+                if(Math.random() > 0.5){
+                    board[r][c] = 2;
+                    if(score > 32){
+                        board[r][c] += 2*Math.floor(Math.random() * 2);
+                    } 
+                }
+                return true; //spawn successful
+            }
+        }
+    }
+    return false; //spawn failed
+}
+
 function updateTile(tile, num){
     tile.innerText = "";
     tile.classList.value = "";
@@ -53,28 +71,52 @@ function updateTile(tile, num){
     }
 }
 
+function checkPossible(){
+    for(let r = 1; r < rows - 1; r++){
+        for(let c = 1; c < columns - 1; c++){
+            let curr = board[r][c];
+            if(curr == board[r-1][c] || curr == board[r+1][c] ||
+                curr == board[r][c-1] || curr == board[r][c+1]){
+                    return true;
+                }
+        }
+    }
+    return false;
+}
+
 document.addEventListener("keyup", (e) => {
+    let spawn_status = false;
     if(e.code == "ArrowLeft"){
         console.log("left arrow");
         slideLeft();
+        spawn_status = spawn();
     }
 
     else if(e.code == "ArrowRight"){
         console.log("right arrow");
         slideRight();
+        spawn_status = spawn();
     }
 
     else if(e.code == "ArrowDown"){
         console.log("down arrow");
         slideDown();
+        spawn_status = spawn();
     }
 
     else if(e.code == "ArrowUp"){
         console.log("up arrow");
         slideUp();
+        spawn_status = spawn();
     }
-    renderBoard();
+
+    if(spawn_status == false){
+        if(!checkPossible()){
+            setGame();
+        }    
+    }
     document.getElementById("score").innerText = score;
+    renderBoard();
 })
 
 function slideLeft(){
@@ -156,10 +198,10 @@ function slideUp(){
             curr_col.push(board[r][c]);
         }
 
-        console.log("curr_col: " + curr_col);
+        // console.log("curr_col: " + curr_col);
         // remove zeros
         curr_col = curr_col.filter(num => num != 0);
-        console.log("rem 0s curr_col: " + curr_col);
+        // console.log("rem 0s curr_col: " + curr_col);
 
         //update
         let i = 0;
@@ -167,23 +209,23 @@ function slideUp(){
             if(curr_col[i] == curr_col[i+1]){
                 curr_col[i] *= 2;
                 curr_col[i+1] = 0;
-                score = curr_col[i];
+                score += curr_col[i];
                 i += 1;
             }
             i += 1;
         }
-        console.log("addn curr_col: " + curr_col);
+        // console.log("addn curr_col: " + curr_col);
 
         //remove zeros
         curr_col = curr_col.filter(num => num != 0);
 
-        console.log("rem 0s curr_col: " + curr_col);
+        // console.log("rem 0s curr_col: " + curr_col);
 
         //load zeros
         while(curr_col.length != columns){
             curr_col.push(0);
         }
-        console.log("final curr_col: " + curr_col);
+        // console.log("final curr_col: " + curr_col);
 
         // update board
         for(let r = 0; r < rows; r++){
@@ -210,7 +252,7 @@ function slideDown(){
             if(curr_col[i] == curr_col[i-1]){
                 curr_col[i] *= 2;
                 curr_col[i-1] = 0;
-                score = curr_col[i];
+                score += curr_col[i];
                 i -= 1;
             }
             i -= 1;
